@@ -8,6 +8,8 @@ SHADOW_DIR="/var/lib/immunity"
 
 if [ ! -d "$SHADOW_DIR/$SHADOW_USER" ]; then
   /usr/sbin/useradd -b $SHADOW_DIR -g $SHADOW_GROUP -m -N "$SHADOW_USER"
+  /usr/bin/setfacl -R -m user:$SUDO_USER:rwX $SHADOW_DIR/$SHADOW_USER
+  /usr/bin/setfacl -R -m default:user:$SUDO_USER:rwx $SHADOW_DIR/$SHADOW_USER
 fi
 
 exit 0
