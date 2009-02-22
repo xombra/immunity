@@ -2,11 +2,12 @@
 
 unset PATH
 
-INTERNET_USER=$(echo -n "$SUDO_USER" | /usr/bin/openssl dgst -md5)
+SHADOW_GROUP="immunity"
+SHADOW_USER="immunity-$SUDO_USER"
+SHADOW_DIR="/var/lib/immunity"
 
-if [ ! -d "/internet/$INTERNET_USER" ]; then
-  /usr/sbin/useradd -b /internet -g internet -m -N -K UID_MIN=10000000 "$INTERNET_USER"
-  /bin/chmod 700 "/internet/$INTERNET_USER"
+if [ ! -d "$SHADOW_DIR/$SHADOW_USER" ]; then
+  /usr/sbin/useradd -b $SHADOW_DIR -g $SHADOW_GROUP -m -N "$SHADOW_USER"
 fi
 
 exit 0

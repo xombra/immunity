@@ -1,5 +1,0 @@
-# create the shadow user in background
-sudo /usr/share/aa-smarti-user/sudo-helper/create-shadow-user &
-
-# start tunnel in background
-/usr/share/aa-smarti-user/tunnel &
