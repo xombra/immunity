@@ -1,0 +1,13 @@
+Source: immunity
+Section: net
+Priority: optional
+Maintainer: Torsten Werner <twerner@debian.org>
+Standards-Version: 3.8.0
+Build-Depends: debhelper (>= 5), cdbs
+
+Package: immunity
+Architecture: all
+Depends: ${misc:Depends}, acl, adduser
+Suggests: ipmasq
+Description: Immunity
+ Run you browser in a secure container

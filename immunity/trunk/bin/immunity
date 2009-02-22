@@ -1,0 +1,61 @@
+#!/usr/bin/python
+
+import cap, hashlib, os, pwd
+from os.path import isdir
+
+def drop_most_privs():
+  cap.set_cap("cap_setgid,cap_setuid+ep")
+
+def drop_all_privs():
+  cap.set_cap("")
+
+def get_xauth():
+  (input, output) = os.popen2(("xauth", "nlist", ":0"), "r")
+  return output.readline()
+
+def set_xauth(data):
+  (input, output) = os.popen2(("xauth", "nmerge", "-"), "w")
+  input.write(data)
+  input.close()
+
+def clear_environment():
+  for key in os.environ.keys():
+    os.unsetenv(key)
+  os.putenv("DISPLAY", ":0")
+  os.putenv("PATH", "/bin:/usr/bin")
+
+def get_target_username():
+  current_uid = os.getuid()
+  current_username = pwd.getpwuid(current_uid)[0]
+  return hashlib.md5(current_username).hexdigest()
+
+def switch_user():
+  pwd_data = pwd.getpwnam(get_target_username())
+  os.putenv("USER", pwd_data[0])
+  homedir = pwd_data[5]
+  os.putenv("HOME", homedir)
+  os.setuid(pwd_data[2])
+  os.setgid(pwd_data[3])
+  os.setgroups([])
+  os.chdir(homedir)
+  tmpdir = homedir + "/tmp"
+  if not isdir(tmpdir):
+    os.mkdir(tmpdir)
+  os.putenv("TMP", tmpdir)
+  os.putenv("TMPDIR", tmpdir)
+
+def main():
+  drop_most_privs()
+  xauth_data = get_xauth()
+  clear_environment()
+
+  switch_user()
+  drop_all_privs()
+
+  set_xauth(xauth_data)
+
+def exec_browser():
+  os.execl("/usr/bin/firefox", "smarti", "-a", "smarti")
+
+main()
+exec_browser()

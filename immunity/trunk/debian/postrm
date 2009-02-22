@@ -1,0 +1,22 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+    remove|purge)
+	if [ -x /etc/init.d/ipmasq ]; then
+	    invoke-rc.d ipmasq restart
+	fi
+    ;;
+
+    upgrade|failed-upgrade)
+    ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
