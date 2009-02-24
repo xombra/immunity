@@ -8,7 +8,6 @@ def switch_user(target_user):
   os.setgroups([])
   os.setuid(pwd_data[2])
   os.putenv("USER", pwd_data[0])
-  os.unsetenv("SUDO_USER")
   homedir = pwd_data[5]
   os.putenv("HOME", homedir)
   os.chdir(homedir)
