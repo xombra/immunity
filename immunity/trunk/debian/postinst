@@ -6,9 +6,6 @@ case "$1" in
     configure|reconfigure)
 	# add group immunity for the shadow users
 	addgroup --system immunity
-	if [ -x /etc/init.d/ipmasq ]; then
-	    invoke-rc.d ipmasq restart
-	fi
     ;;
 
     upgrade|abort-upgrade|abort-remove|abort-deconfigure)

@@ -6,9 +6,6 @@ case "$1" in
     remove|purge)
         # delete group immunity for the shadow users
 	delgroup --only-if-empty immunity || true
-	if [ -x /etc/init.d/ipmasq ]; then
-	    invoke-rc.d ipmasq restart
-	fi
     ;;
 
     upgrade|failed-upgrade)
