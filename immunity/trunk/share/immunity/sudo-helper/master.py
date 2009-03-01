@@ -4,9 +4,11 @@ import os, pwd
 from os.path import isdir
 
 def clear_environment():
+  language = os.getenv("LANG")
   for key in os.environ.keys():
     os.unsetenv(key)
   os.putenv("DISPLAY", ":0")
+  os.putenv("LANG", language)
   os.putenv("PATH", "/bin:/usr/bin")
 
 def get_xauth():
