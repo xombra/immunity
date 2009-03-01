@@ -1,4 +1,4 @@
-#summary This page describes how to install immunity.
+﻿#summary This page describes how to install immunity.
 #labels Featured,Phase-Deploy
 
 = Debian, Ubuntu or other Debian derivatives =
@@ -16,3 +16,6 @@ Add a line
 ALL ALL=(ALL)NOPASSWD: /usr/share/immunity/sudo-helper/
 }}}
 to {{{/etc/sudoers}}} manually. Finally you have to log out and log in yourself.
+
+Please file any bugs at [http://code.google.com/p/immunity/issues/list the
+issue tracker].
