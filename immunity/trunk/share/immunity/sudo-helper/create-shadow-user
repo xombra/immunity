@@ -9,6 +9,7 @@ SHADOW_HOME="/var/lib/immunity/$SUDO_USER"
 
 NEW_ACLS="user:$SUDO_USER:rwX,default:user:$SUDO_USER:rwx"
 /usr/bin/setfacl -R -m "$NEW_ACLS" $SHADOW_HOME
+/bin/chmod -R go-rwx $SHADOW_HOME/tmp
 
 exit 0
 
