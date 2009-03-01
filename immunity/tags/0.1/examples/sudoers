@@ -1,0 +1,6 @@
+# This file snippet or something similar should be added to your
+# /etc/sudoers configuration file. It won't be added or removed
+# automatically.
+
+ALL ALL=(ALL)NOPASSWD: /usr/share/immunity/sudo-helper/
+

@@ -1,0 +1,21 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+    remove|purge)
+        # delete group immunity for the shadow users
+	delgroup --only-if-empty immunity || true
+    ;;
+
+    upgrade|failed-upgrade)
+    ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
