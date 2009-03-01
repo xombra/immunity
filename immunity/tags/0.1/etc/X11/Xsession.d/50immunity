@@ -1,2 +1,0 @@
-# create the shadow user in background
-sudo /usr/share/immunity/sudo-helper/create-shadow-user &
