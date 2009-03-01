@@ -1,0 +1,17 @@
+# output rules for smarti
+
+# create output chain
+$IPTABLES -N SMARTI_OUT
+
+# allow internet access for local processes of group 'internet'
+$IPTABLES -p tcp --dport 8080 -A SMARTI_OUT -o lo -m owner --gid-owner internet -j ACCEPT
+
+# deny intranet access for local processes of group 'internet'
+$IPTABLES -m owner -I SMARTI_OUT 2 --gid-owner internet -j REJECT
+
+# deny internet access for everybody else
+$IPTABLES -p tcp --dport 8080 -A SMARTI_OUT -o    lo -j REJECT
+
+# activate chain
+iptables -I OUTPUT 1 -j SMARTI_OUT
+

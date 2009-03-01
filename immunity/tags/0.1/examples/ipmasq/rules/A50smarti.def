@@ -1,0 +1,10 @@
+# clean up rules  for smarti
+
+# flush chains
+$IPTABLES -F SMARTI_IN  2> /dev/null
+$IPTABLES -F SMARTI_OUT 2> /dev/null
+
+# delete chains
+$IPTABLES -X SMARTI_IN  2> /dev/null
+$IPTABLES -X SMARTI_OUT 2> /dev/null
+
