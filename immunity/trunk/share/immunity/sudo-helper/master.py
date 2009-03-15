@@ -18,12 +18,6 @@ def get_xauth():
   (input, output) = os.popen2(("/usr/share/immunity/get_xauth.py",), "r")
   return output.readline()
 
-def make_tmpdir(tmpdir):
-  if not isdir(tmpdir):
-    os.mkdir(tmpdir)
-  os.putenv("TMP", tmpdir)
-  os.putenv("TMPDIR", tmpdir)
-
 def new_namespace():
   immunity.unshare_newns()
 
@@ -65,7 +59,6 @@ def switch_user(target_user):
   homedir = pwd_data[5]
   os.putenv("HOME", homedir)
   os.chdir(homedir)
-  make_tmpdir(homedir + "/tmp")
 
 def set_xauth(data):
   (input, output) = os.popen2(("xauth", "nmerge", "-"), "w")
