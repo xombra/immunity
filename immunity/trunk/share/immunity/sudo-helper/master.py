@@ -21,20 +21,26 @@ def get_xauth():
 def new_namespace():
   immunity.unshare_newns()
 
-def mount_bind(dir):
-  target = "/mnt" + dir
-  os.makedirs(target)
-  immunity.mount_bind(dir, target)
-
-def mount_tmpfs(dir):
+def makedirs(dir):
   if not os.path.exists(dir):
     os.makedirs(dir)
+
+def mount_bind(path):
+  target = "/mnt" + path
+  if os.path.isdir(path):
+    makedirs(target)
+  else:
+    makedirs(os.path.dirname(target))
+    open(target, "w").close()
+  immunity.mount_bind(path, target)
+
+def mount_tmpfs(dir):
+  makedirs(dir)
   immunity.mount("tmpfs", dir, "tmpfs")
   os.chmod(dir, 0755)
 
-def secure_dev():
-  mount_tmpfs("/mnt/dev")
-  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/null", "/mnt/dev/")
+def alsa():
+  makedirs("/mnt/dev")
   os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/snd", "/mnt/dev/")
   for dev_file in os.listdir("/mnt/dev/snd"):
     os.chmod("/mnt/dev/snd/" + dev_file, 0666)
@@ -42,8 +48,29 @@ def secure_dev():
 def fake_filesystem():
   mount_tmpfs("/mnt")
   mount_bind("/bin")
-  mount_bind("/etc")
+  mount_bind("/dev/null")
+  mount_bind("/etc/X11")
+  mount_bind("/etc/alternatives")
+  mount_bind("/etc/fonts")
+  mount_bind("/etc/gai.conf")
+  mount_bind("/etc/gconf")
+  mount_bind("/etc/gnome-vfs-2.0")
+  mount_bind("/etc/gtk-2.0")
+  mount_bind("/etc/host.conf")
+  mount_bind("/etc/hosts")
+  mount_bind("/etc/iceweasel")
+  mount_bind("/etc/ld.so.cache")
+  mount_bind("/etc/locale.alias")
+  mount_bind("/etc/localtime")
+  mount_bind("/etc/mime.types")
+  mount_bind("/etc/nsswitch.conf")
+  mount_bind("/etc/orbitrc")
+  mount_bind("/etc/pango")
+  mount_bind("/etc/passwd")
+  mount_bind("/etc/resolv.conf")
+  mount_bind("/etc/resolvconf")
   mount_bind("/lib")
+  mount_bind("/proc")
   mount_bind("/tmp/.X11-unix")
   mount_bind("/usr/bin")
   mount_bind("/usr/lib")
@@ -52,9 +79,11 @@ def fake_filesystem():
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_chroot+ep")
   os.chmod("/mnt/tmp", 0777)
-  secure_dev()
+  alsa()
   os.chroot("/mnt")
+  immunity.set_cap("cap_setgid,cap_setuid+ep")
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
