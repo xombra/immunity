@@ -1,10 +1,11 @@
 immunity (0.2) UNRELEASED; urgency=low
 
   * Use a private namespace.
+  * Unmount most filesystems.
   * Allow executing user specified command.
   * Change default command to /bin/sh.
 
- -- Torsten Werner <twerner@debian.org>  Sun, 15 Mar 2009 11:48:59 +0100
+ -- Torsten Werner <twerner@debian.org>  Sun, 15 Mar 2009 12:03:42 +0100
 
 immunity (0.1) experimental; urgency=low
 

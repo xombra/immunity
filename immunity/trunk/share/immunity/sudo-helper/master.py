@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, pwd, sys
+import immunity, os, pwd, sys
 from os.path import isdir
 
 def clear_environment():
@@ -20,6 +20,20 @@ def make_tmpdir(tmpdir):
     os.mkdir(tmpdir)
   os.putenv("TMP", tmpdir)
   os.putenv("TMPDIR", tmpdir)
+
+def new_namespace():
+  immunity.unshare_newns()
+  os.chdir("/")
+
+  immunity.umount("/boot")
+  immunity.umount("/home")
+  immunity.umount("/lib/init/rw/splashy")
+  immunity.umount("/lib/init/rw")
+  immunity.umount("/proc/bus/usb")
+  immunity.umount("/proc/sys/fs/binfmt_misc")
+  immunity.umount("/proc")
+  immunity.umount("/sys/fs/fuse/connections")
+  immunity.umount("/sys")
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
@@ -41,6 +55,8 @@ def main():
   sudo_user = os.getenv("SUDO_USER")
   xauth_data = get_xauth()
   clear_environment()
+
+  new_namespace()
 
   switch_user("immunity-" + sudo_user)
 
