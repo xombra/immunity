@@ -1,6 +1,3 @@
-help:
-	@echo "Please run 'sudo make install' to install immunity."
-
 PYTHON ?= python
 
 ifdef DESTDIR
@@ -9,6 +6,7 @@ endif
 
 buildpython:
 	$(PYTHON) setup.py build
+	@echo "Please run 'sudo make install' now."
 
 installpython: buildpython
 	$(PYTHON) setup.py install $(INSTALL_OPTS)

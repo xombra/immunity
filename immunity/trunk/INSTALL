@@ -1,3 +1,4 @@
-To install immunity please execute:
+To build and install immunity please execute:
 
+make
 sudo make install
