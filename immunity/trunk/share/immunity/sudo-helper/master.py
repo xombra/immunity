@@ -50,10 +50,11 @@ def secure_var_tmp():
 
 def secure_dev():
   immunity.mount("tmpfs", "/mnt", "tmpfs")
-  os.system("cp -a /dev/null /mnt/")
-  os.system("cp -a /dev/snd /mnt/")
+  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/null", "/mnt/")
+  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/snd", "/mnt/")
   immunity.mount_move("/mnt", "/dev")
-  os.system("chmod 666 /dev/snd/*")
+  for dev_file in os.listdir("/dev/snd"):
+    os.chmod("/dev/snd/" + dev_file, 0666)
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
@@ -95,7 +96,7 @@ def exec_command():
     command = "/bin/sh"
   args = [command]
   args.extend(sys.argv[2:])
-  os.execv(command, args)
+  os.execvp(command, args)
 
 main()
 exec_command()
