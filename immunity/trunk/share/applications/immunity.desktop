@@ -1,6 +1,6 @@
 [Desktop Entry]
 Comment=
-Exec=immunity
+Exec=immunity /usr/bin/firefox -a immunity
 GenericName=
 Name=Immunity
 Type=Application

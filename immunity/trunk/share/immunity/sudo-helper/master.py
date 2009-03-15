@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, pwd
+import os, pwd, sys
 from os.path import isdir
 
 def clear_environment():
@@ -46,8 +46,14 @@ def main():
 
   set_xauth(xauth_data)
 
-def exec_browser():
-  os.execl("/usr/bin/firefox", "immunity", "-a", "immunity")
+def exec_command():
+  if len(sys.argv) > 1:
+    command = sys.argv[1]
+  else:
+    command = "/bin/sh"
+  args = [command]
+  args.extend(sys.argv[2:])
+  os.execv(command, args)
 
 main()
-exec_browser()
+exec_command()
