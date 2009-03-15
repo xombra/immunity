@@ -13,3 +13,6 @@ debian/stamp-install-%:
 
 install/immunity:: $(addprefix debian/stamp-install-, $(PYTHON_VERSIONS))
 	dh_pysupport -pimmunity
+
+clean::
+	$(RM) debian/stamp-install-python*

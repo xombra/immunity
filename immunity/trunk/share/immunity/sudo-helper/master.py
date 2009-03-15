@@ -49,8 +49,8 @@ def secure_dev():
   immunity.mount("tmpfs", "/mnt", "tmpfs")
   os.system("cp -a /dev/null /mnt/")
   os.system("cp -a /dev/snd /mnt/")
-  os.system("chmod 666 /dev/snd/*")
   immunity.mount_move("/mnt", "/dev")
+  os.system("chmod 666 /dev/snd/*")
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
