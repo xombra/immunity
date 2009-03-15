@@ -26,21 +26,21 @@ def mount_bind(dir):
   os.makedirs(target)
   immunity.mount_bind(dir, target)
 
-def tmpfs(dir):
-  target = "/mnt" + dir
-  os.makedirs(target)
-  immunity.mount("tmpfs", target, "tmpfs")
+def mount_tmpfs(dir):
+  if not os.path.exists(dir):
+    os.makedirs(dir)
+  immunity.mount("tmpfs", dir, "tmpfs")
+  os.chmod(dir, 0755)
 
 def secure_dev():
-  os.makedirs("/mnt/dev")
-  immunity.mount("tmpfs", "/mnt/dev", "tmpfs")
+  mount_tmpfs("/mnt/dev")
   os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/null", "/mnt/dev/")
   os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/snd", "/mnt/dev/")
   for dev_file in os.listdir("/mnt/dev/snd"):
     os.chmod("/mnt/dev/snd/" + dev_file, 0666)
 
 def fake_filesystem():
-  immunity.mount("tmpfs", "/mnt", "tmpfs")
+  mount_tmpfs("/mnt")
   mount_bind("/bin")
   mount_bind("/etc")
   mount_bind("/lib")
@@ -53,7 +53,6 @@ def fake_filesystem():
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
   os.chmod("/mnt/tmp", 0777)
-  tmpfs("/var/tmp")
   secure_dev()
   os.chroot("/mnt")
 
