@@ -47,7 +47,7 @@ def main():
   set_xauth(xauth_data)
 
 def exec_browser():
-  os.execl("/usr/bin/firefox", "smarti", "-a", "smarti")
+  os.execl("/usr/bin/firefox", "immunity", "-a", "immunity")
 
 main()
 exec_browser()
