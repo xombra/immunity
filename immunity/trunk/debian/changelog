@@ -1,15 +1,14 @@
 immunity (0.2) UNRELEASED; urgency=low
 
   * Use a private namespace.
-  * Unmount most filesystems.
-  * Secure other filesystems (/tmp, /var/tmp, /dev).
+  * Fake up a fully different filesystem.
   * Allow executing user specified command.
   * Change default command to /bin/sh.
   * Add capability support.
   * Drop most capabilities early.
   * Do no longer create a separate tmp directory.
 
- -- Torsten Werner <twerner@debian.org>  Sun, 15 Mar 2009 14:42:02 +0100
+ -- Torsten Werner <twerner@debian.org>  Sun, 15 Mar 2009 16:29:24 +0100
 
 immunity (0.1) experimental; urgency=low
 

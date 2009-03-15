@@ -4,7 +4,7 @@ import immunity, os, pwd, sys
 from os.path import isdir
 
 def reduce_capabilities():
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin+ep")
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot+ep")
 
 def clear_environment():
   language = os.getenv("LANG")
@@ -21,34 +21,31 @@ def get_xauth():
 def new_namespace():
   immunity.unshare_newns()
 
-def umount_filesystems():
-  os.chdir("/")
-  immunity.umount("/boot")
-  immunity.umount("/home")
-  immunity.umount("/lib/init/rw/splashy")
-  immunity.umount("/lib/init/rw")
-  immunity.umount("/proc/bus/usb")
-  immunity.umount("/proc/sys/fs/binfmt_misc")
-  immunity.umount("/proc")
-  immunity.umount("/sys/fs/fuse/connections")
-  immunity.umount("/sys")
-
-def secure_tmp():
-  immunity.mount("tmpfs", "/mnt", "tmpfs")
-  os.mkdir("/mnt/.X11-unix")
-  immunity.mount_bind("/tmp/.X11-unix", "/mnt/.X11-unix")
-  immunity.mount_move("/mnt", "/tmp")
-
-def secure_var_tmp():
-  immunity.mount("tmpfs", "/var/tmp", "tmpfs")
+def mount_bind(dir):
+  target = "/mnt" + dir
+  os.makedirs(target)
+  immunity.mount_bind(dir, target)
 
 def secure_dev():
+  os.makedirs("/mnt/dev")
+  immunity.mount("tmpfs", "/mnt/dev", "tmpfs")
+  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/null", "/mnt/dev/")
+  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/snd", "/mnt/dev/")
+  for dev_file in os.listdir("/mnt/dev/snd"):
+    os.chmod("/mnt/dev/snd/" + dev_file, 0666)
+
+def fake_filesystem():
   immunity.mount("tmpfs", "/mnt", "tmpfs")
-  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/null", "/mnt/")
-  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/snd", "/mnt/")
-  immunity.mount_move("/mnt", "/dev")
-  for dev_file in os.listdir("/dev/snd"):
-    os.chmod("/dev/snd/" + dev_file, 0666)
+  mount_bind("/bin")
+  mount_bind("/etc")
+  mount_bind("/lib")
+  mount_bind("/tmp/.X11-unix")
+  mount_bind("/usr")
+  mount_bind("/var")
+  os.chmod("/mnt/tmp", 0777)
+  immunity.mount("tmpfs", "/mnt/var/tmp", "tmpfs")
+  secure_dev()
+  os.chroot("/mnt")
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
@@ -73,10 +70,7 @@ def main():
   clear_environment()
 
   new_namespace()
-  umount_filesystems()
-  secure_tmp()
-  secure_var_tmp()
-  secure_dev()
+  fake_filesystem()
 
   switch_user("immunity-" + sudo_user)
 
