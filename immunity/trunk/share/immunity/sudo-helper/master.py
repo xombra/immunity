@@ -3,6 +3,9 @@
 import immunity, os, pwd, sys
 from os.path import isdir
 
+def reduce_capabilities():
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin+ep")
+
 def clear_environment():
   language = os.getenv("LANG")
   for key in os.environ.keys():
@@ -69,6 +72,8 @@ def set_xauth(data):
   input.close()
 
 def main():
+  reduce_capabilities()
+
   sudo_user = os.getenv("SUDO_USER")
   xauth_data = get_xauth()
   clear_environment()
