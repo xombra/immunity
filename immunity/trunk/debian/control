@@ -3,11 +3,11 @@ Section: net
 Priority: optional
 Maintainer: Torsten Werner <twerner@debian.org>
 Standards-Version: 3.8.0
-Build-Depends: debhelper (>= 5), cdbs
+Build-Depends: debhelper (>= 5), cdbs, python-support
 
 Package: immunity
-Architecture: all
-Depends: ${misc:Depends}, acl, adduser, python
+Architecture: any
+Depends: ${misc:Depends}, acl, adduser, ${python:Depends}, ${shlibs:Depends}
 Suggests: ipmasq
 Description: Execute your browser in a secure container
  Immunity runs your browser in a secure container.

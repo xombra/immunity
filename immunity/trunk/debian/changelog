@@ -1,3 +1,9 @@
+immunity (0.2) UNRELEASED; urgency=low
+
+  * Use a private namespace.
+
+ -- Torsten Werner <twerner@debian.org>  Sun, 15 Mar 2009 10:18:14 +0100
+
 immunity (0.1) experimental; urgency=low
 
   * initial release
