@@ -23,8 +23,9 @@ def make_tmpdir(tmpdir):
 
 def new_namespace():
   immunity.unshare_newns()
-  os.chdir("/")
 
+def umount_filesystems():
+  os.chdir("/")
   immunity.umount("/boot")
   immunity.umount("/home")
   immunity.umount("/lib/init/rw/splashy")
@@ -34,6 +35,22 @@ def new_namespace():
   immunity.umount("/proc")
   immunity.umount("/sys/fs/fuse/connections")
   immunity.umount("/sys")
+
+def secure_tmp():
+  immunity.mount("tmpfs", "/mnt", "tmpfs")
+  os.mkdir("/mnt/.X11-unix")
+  immunity.mount_bind("/tmp/.X11-unix", "/mnt/.X11-unix")
+  immunity.mount_move("/mnt", "/tmp")
+
+def secure_var_tmp():
+  immunity.mount("tmpfs", "/var/tmp", "tmpfs")
+
+def secure_dev():
+  immunity.mount("tmpfs", "/mnt", "tmpfs")
+  os.system("cp -a /dev/null /mnt/")
+  os.system("cp -a /dev/snd /mnt/")
+  os.system("chmod 666 /dev/snd/*")
+  immunity.mount_move("/mnt", "/dev")
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
@@ -57,6 +74,10 @@ def main():
   clear_environment()
 
   new_namespace()
+  umount_filesystems()
+  secure_tmp()
+  secure_var_tmp()
+  secure_dev()
 
   switch_user("immunity-" + sudo_user)
 
