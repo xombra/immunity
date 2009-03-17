@@ -3,8 +3,10 @@
 import immunity, os, pwd, sys
 from os.path import isdir
 
-def reduce_capabilities():
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot+ep")
+def no_supplementary_groups():
+  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_sys_chroot+p")
+  os.setgroups([])
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot+p")
 
 def clear_environment():
   language = os.getenv("LANG")
@@ -19,7 +21,9 @@ def get_xauth():
   return output.readline()
 
 def new_namespace():
+  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_sys_chroot+p")
   immunity.unshare_newns()
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot+p")
 
 def makedirs(dir):
   if not os.path.exists(dir):
@@ -46,6 +50,7 @@ def alsa():
     os.chmod("/mnt/dev/snd/" + dev_file, 0666)
 
 def fake_filesystem():
+  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_sys_chroot+p")
   mount_tmpfs("/mnt")
   mount_bind("/bin")
   mount_bind("/dev/null")
@@ -79,17 +84,20 @@ def fake_filesystem():
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_chroot+ep")
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_chroot+p")
   os.chmod("/mnt/tmp", 0777)
   alsa()
+  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_chroot+ep")
   os.chroot("/mnt")
-  immunity.set_cap("cap_setgid,cap_setuid+ep")
+  immunity.set_cap("cap_setgid,cap_setuid+p")
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
+  immunity.set_cap("cap_setgid+ep cap_setuid+p")
   os.setgid(pwd_data[3])
-  os.setgroups([])
+  immunity.set_cap("cap_setuid+ep")
   os.setuid(pwd_data[2])
+  immunity.set_cap("")
   os.putenv("USER", pwd_data[0])
   homedir = pwd_data[5]
   os.putenv("HOME", homedir)
@@ -101,7 +109,7 @@ def set_xauth(data):
   input.close()
 
 def main():
-  reduce_capabilities()
+  no_supplementary_groups()
 
   sudo_user = os.getenv("SUDO_USER")
   xauth_data = get_xauth()
