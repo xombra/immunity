@@ -3,10 +3,11 @@
 #include <sys/mount.h>
 #include <linux/fs.h>
 #include <sys/capability.h>
-
-static PyObject* unshare_newns(PyObject *self, PyObject *args);
+#include <sys/prctl.h>
 
 static PyObject *ImmunityException;
+
+static PyObject* unshare_newns(PyObject *self, PyObject *args);
 
 PyObject* unshare_newns(PyObject *self, PyObject *args)
 {
@@ -115,6 +116,18 @@ PyObject* do_set_cap(PyObject *self, PyObject *args)
   return Py_None;
 }
 
+static PyObject* keep_caps(PyObject *self, PyObject *args);
+
+PyObject* keep_caps(PyObject *self, PyObject *args)
+{
+  if (prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0) < 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
 static PyMethodDef ImmunityMethods[] = {
   {"unshare_newns",  unshare_newns, METH_VARARGS, "unshare(newns)"},
   {"umount",  do_umount, METH_VARARGS, "umount"},
@@ -122,6 +135,7 @@ static PyMethodDef ImmunityMethods[] = {
   {"mount_bind",  do_mount_bind, METH_VARARGS, "mount(,,,MS_BIND,)"},
   {"mount_move",  do_mount_move, METH_VARARGS, "mount(,,,MS_MOVE,)"},
   {"set_cap",  do_set_cap, METH_VARARGS, "set_cap"},
+  {"keep_caps",  keep_caps, METH_VARARGS, "keep_caps"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
