@@ -27,10 +27,22 @@ def clear_environment():
   os.putenv("LANG", language)
   os.putenv("PATH", "/bin:/usr/bin")
 
+def switch_user(target_user):
+  pwd_data = pwd.getpwnam(target_user)
+  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
+  os.setgid(pwd_data[3])
+  immunity.set_cap("cap_setuid+ep cap_sys_admin,cap_mknod,cap_sys_chroot+p")
+  os.setuid(pwd_data[2])
+  immunity.set_cap("cap_sys_admin,cap_mknod,cap_sys_chroot+p")
+  os.putenv("USER", pwd_data[0])
+  homedir = pwd_data[5]
+  os.putenv("HOME", homedir)
+  os.chdir(homedir)
+
 def new_namespace():
-  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_mknod,cap_sys_chroot+p")
+  immunity.set_cap("cap_sys_admin+ep cap_mknod,cap_sys_chroot+p")
   immunity.unshare_newns()
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
+  immunity.set_cap("cap_sys_admin,cap_mknod,cap_sys_chroot+p")
 
 def makedirs(dir):
   if not os.path.exists(dir):
@@ -52,14 +64,12 @@ def mount_tmpfs(dir):
 
 def alsa():
   makedirs("/mnt/dev/snd")
-  mask = os.umask(0)
   for dev_file in os.listdir("/dev/snd"):
     rdev = os.stat("/dev/snd/" + dev_file).st_rdev
-    os.mknod("/mnt/dev/snd/" + dev_file, 0666 | stat.S_IFCHR, rdev)
-  os.umask(mask)
+    os.mknod("/mnt/dev/snd/" + dev_file, 0600 | stat.S_IFCHR, rdev)
 
 def fake_filesystem():
-  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_mknod,cap_sys_chroot+p")
+  immunity.set_cap("cap_sys_admin+ep cap_mknod,cap_sys_chroot+p")
   mount_tmpfs("/mnt")
   mount_bind("/bin")
   mount_bind("/dev/null")
@@ -94,23 +104,12 @@ def fake_filesystem():
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
   os.chmod("/mnt/tmp", 0777)
-  immunity.set_cap("cap_setgid,cap_setuid+p cap_mknod+ep cap_sys_chroot+p")
+  immunity.set_cap("cap_mknod+ep cap_sys_chroot+p")
   alsa()
-  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_chroot+ep")
+  immunity.set_cap("cap_sys_chroot+ep")
   os.chroot("/mnt")
-  immunity.set_cap("cap_setgid,cap_setuid+p")
-
-def switch_user(target_user):
-  pwd_data = pwd.getpwnam(target_user)
-  immunity.set_cap("cap_setgid+ep cap_setuid+p")
-  os.setgid(pwd_data[3])
-  immunity.set_cap("cap_setuid+ep")
-  os.setuid(pwd_data[2])
   immunity.set_cap("")
-  os.putenv("USER", pwd_data[0])
-  homedir = pwd_data[5]
-  os.putenv("HOME", homedir)
-  os.chdir(homedir)
+  os.chdir(os.getcwd())
 
 def set_xauth(data):
   (input, output) = os.popen2(("xauth", "nmerge", "-"), "w")
@@ -123,10 +122,10 @@ def main():
   xauth_data = get_xauth(sudo_user)
   clear_environment()
 
+  switch_user("immunity-" + sudo_user)
+
   new_namespace()
   fake_filesystem()
-
-  switch_user("immunity-" + sudo_user)
 
   set_xauth(xauth_data)
 
