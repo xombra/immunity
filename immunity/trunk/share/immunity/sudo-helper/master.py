@@ -1,12 +1,23 @@
 #!/usr/bin/python
 
-import immunity, os, pwd, sys
+import immunity, os, pwd, stat, sys
 from os.path import isdir
 
-def no_supplementary_groups():
-  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_sys_chroot+p")
+def switch_sudo_user(target_user):
+  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
   os.setgroups([])
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot+p")
+  pwd_data = pwd.getpwnam(target_user)
+  os.setgid(pwd_data[3])
+  os.setgroups([])
+  immunity.set_cap("cap_setgid+p cap_setuid+ep cap_sys_admin,cap_mknod,cap_sys_chroot+p")
+  immunity.keep_caps()
+  os.setuid(pwd_data[2])
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
+
+def get_xauth(target_user):
+  switch_sudo_user(target_user)
+  (input, output) = os.popen2(("/usr/share/immunity/get_xauth.py",), "r")
+  return output.readline()
 
 def clear_environment():
   language = os.getenv("LANG")
@@ -16,14 +27,10 @@ def clear_environment():
   os.putenv("LANG", language)
   os.putenv("PATH", "/bin:/usr/bin")
 
-def get_xauth():
-  (input, output) = os.popen2(("/usr/share/immunity/get_xauth.py",), "r")
-  return output.readline()
-
 def new_namespace():
-  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_sys_chroot+p")
+  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_mknod,cap_sys_chroot+p")
   immunity.unshare_newns()
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot+p")
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
 
 def makedirs(dir):
   if not os.path.exists(dir):
@@ -44,13 +51,15 @@ def mount_tmpfs(dir):
   os.chmod(dir, 0755)
 
 def alsa():
-  makedirs("/mnt/dev")
-  os.spawnlp(os.P_WAIT, "cp", "cp", "-a", "/dev/snd", "/mnt/dev/")
-  for dev_file in os.listdir("/mnt/dev/snd"):
-    os.chmod("/mnt/dev/snd/" + dev_file, 0666)
+  makedirs("/mnt/dev/snd")
+  mask = os.umask(0)
+  for dev_file in os.listdir("/dev/snd"):
+    rdev = os.stat("/dev/snd/" + dev_file).st_rdev
+    os.mknod("/mnt/dev/snd/" + dev_file, 0666 | stat.S_IFCHR, rdev)
+  os.umask(mask)
 
 def fake_filesystem():
-  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_sys_chroot+p")
+  immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_admin+ep cap_mknod,cap_sys_chroot+p")
   mount_tmpfs("/mnt")
   mount_bind("/bin")
   mount_bind("/dev/null")
@@ -84,8 +93,8 @@ def fake_filesystem():
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_chroot+p")
   os.chmod("/mnt/tmp", 0777)
+  immunity.set_cap("cap_setgid,cap_setuid+p cap_mknod+ep cap_sys_chroot+p")
   alsa()
   immunity.set_cap("cap_setgid,cap_setuid+p cap_sys_chroot+ep")
   os.chroot("/mnt")
@@ -109,10 +118,9 @@ def set_xauth(data):
   input.close()
 
 def main():
-  no_supplementary_groups()
-
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
   sudo_user = os.getenv("SUDO_USER")
-  xauth_data = get_xauth()
+  xauth_data = get_xauth(sudo_user)
   clear_environment()
 
   new_namespace()
