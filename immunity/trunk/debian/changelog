@@ -1,4 +1,4 @@
-immunity (0.2) UNRELEASED; urgency=low
+immunity (0.2) experimental; urgency=low
 
   * Use a private namespace.
   * Fake up a fully different filesystem.
