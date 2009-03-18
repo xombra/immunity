@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/makefile.mk
+
+PYTHON_VERSIONS         := $(shell pyversions -r)
+DEB_MAKE_INSTALL_TARGET := installfiles DESTDIR=$(DEB_DESTDIR)
+
+debian/stamp-install-%:
+	$(RM) -r build
+	$(MAKE) installpython PYTHON=$* DESTDIR=$(DEB_DESTDIR)
+	touch $@
+
+install/immunity:: $(addprefix debian/stamp-install-, $(PYTHON_VERSIONS))
+	dh_pysupport -pimmunity
+
+clean::
+	$(RM) debian/stamp-install-python*
