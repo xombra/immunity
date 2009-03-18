@@ -1,17 +1,16 @@
 #!/usr/bin/python
 
 import immunity, os, pwd, stat, sys
-from os.path import isdir
 
 def switch_sudo_user(target_user):
   immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
   os.setgroups([])
   pwd_data = pwd.getpwnam(target_user)
-  os.setgid(pwd_data[3])
+  os.setgid(pwd_data.pw_gid)
   os.setgroups([])
   immunity.set_cap("cap_setgid+p cap_setuid+ep cap_sys_admin,cap_mknod,cap_sys_chroot+p")
   immunity.keep_caps()
-  os.setuid(pwd_data[2])
+  os.setuid(pwd_data.pw_uid)
   immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
 
 def get_xauth(target_user):
@@ -30,12 +29,12 @@ def clear_environment():
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
   immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_mknod,cap_sys_chroot+p")
-  os.setgid(pwd_data[3])
+  os.setgid(pwd_data.pw_gid)
   immunity.set_cap("cap_setuid+ep cap_sys_admin,cap_mknod,cap_sys_chroot+p")
-  os.setuid(pwd_data[2])
+  os.setuid(pwd_data.pw_uid)
   immunity.set_cap("cap_sys_admin,cap_mknod,cap_sys_chroot+p")
-  os.putenv("USER", pwd_data[0])
-  homedir = pwd_data[5]
+  os.putenv("USER", pwd_data.pw_name)
+  homedir = pwd_data.pw_dir
   os.putenv("HOME", homedir)
   os.chdir(homedir)
 
