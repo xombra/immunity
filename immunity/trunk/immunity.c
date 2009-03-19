@@ -128,6 +128,44 @@ PyObject* keep_caps(PyObject *self, PyObject *args)
   Py_INCREF(Py_None);
   return Py_None;
 }
+
+static PyObject* lock_caps(PyObject *self, PyObject *args);
+
+#define SECURE_NOROOT                   0
+#define SECURE_NOROOT_LOCKED            1
+#define SECURE_NO_SETUID_FIXUP          2
+#define SECURE_NO_SETUID_FIXUP_LOCKED   3
+#define SECURE_KEEP_CAPS                4
+#define SECURE_KEEP_CAPS_LOCKED         5
+
+PyObject* lock_caps(PyObject *self, PyObject *args)
+{
+  int cap;
+
+  if (prctl(PR_SET_KEEPCAPS, 0, 0, 0, 0) < 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+  if (prctl(PR_SET_SECUREBITS,
+    1 << SECURE_KEEP_CAPS_LOCKED |
+    1 << SECURE_NO_SETUID_FIXUP |
+    1 << SECURE_NO_SETUID_FIXUP_LOCKED |
+    1 << SECURE_NOROOT |
+    1 << SECURE_NOROOT_LOCKED) < 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+  for(cap = 0; cap <= CAP_LAST_CAP; cap++) {
+    if (prctl(PR_CAPBSET_DROP, cap, 0, 0, 0) < 0) {
+      PyErr_SetFromErrno(ImmunityException);
+      return NULL;
+    }
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyMethodDef ImmunityMethods[] = {
   {"unshare_newns",  unshare_newns, METH_VARARGS, "unshare(newns)"},
   {"umount",  do_umount, METH_VARARGS, "umount"},
@@ -136,6 +174,7 @@ static PyMethodDef ImmunityMethods[] = {
   {"mount_move",  do_mount_move, METH_VARARGS, "mount(,,,MS_MOVE,)"},
   {"set_cap",  do_set_cap, METH_VARARGS, "set_cap"},
   {"keep_caps",  keep_caps, METH_VARARGS, "keep_caps"},
+  {"lock_caps",  lock_caps, METH_VARARGS, "lock_caps"},
   {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
