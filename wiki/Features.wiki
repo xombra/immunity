@@ -12,7 +12,7 @@
  * employs polyinstantiation of the filesystem
  * narrows the filesystem in the container
  * disables suid and sgid binaries
- * reduces number of device files to /dev/null and /dev/snd/* (alsa)
+ * reduces number of device files to {{{/dev/null}}} and {{{/dev/snd/*}}} (alsa)
  * locks down all capabilities
  * implemented in Python
 
