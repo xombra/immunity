@@ -20,40 +20,6 @@ PyObject* unshare_newns(PyObject *self, PyObject *args)
   return Py_None;
 }
 
-static PyObject* do_umount(PyObject *self, PyObject *args);
-
-PyObject* do_umount(PyObject *self, PyObject *args)
-{
-  const char* target;
-  if (!PyArg_ParseTuple(args, "s", &target)) {
-    return NULL;
-  }
-  if (umount(target) != 0) {
-    PyErr_SetFromErrno(ImmunityException);
-    return NULL;
-  }
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject* do_mount(PyObject *self, PyObject *args);
-
-PyObject* do_mount(PyObject *self, PyObject *args)
-{
-  const char *source, *target, *filesystem;
-  if (!PyArg_ParseTuple(args, "sss", &source, &target, &filesystem)) {
-    return NULL;
-  }
-  if (mount(source, target, filesystem, 0, NULL) != 0) {
-    PyErr_SetFromErrno(ImmunityException);
-    return NULL;
-  }
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
 static PyObject* do_mount_bind(PyObject *self, PyObject *args);
 
 PyObject* do_mount_bind(PyObject *self, PyObject *args)
@@ -63,23 +29,6 @@ PyObject* do_mount_bind(PyObject *self, PyObject *args)
     return NULL;
   }
   if (mount(source, target, NULL, MS_BIND, NULL) != 0) {
-    PyErr_SetFromErrno(ImmunityException);
-    return NULL;
-  }
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject* do_mount_move(PyObject *self, PyObject *args);
-
-PyObject* do_mount_move(PyObject *self, PyObject *args)
-{
-  const char *source, *target;
-  if (!PyArg_ParseTuple(args, "ss", &source, &target)) {
-    return NULL;
-  }
-  if (mount(source, target, NULL, MS_MOVE, NULL) != 0) {
     PyErr_SetFromErrno(ImmunityException);
     return NULL;
   }
@@ -202,10 +151,7 @@ PyObject* lock_caps(PyObject *self, PyObject *args)
 
 static PyMethodDef ImmunityMethods[] = {
   {"unshare_newns",  unshare_newns, METH_VARARGS, "unshare(newns)"},
-  {"umount",  do_umount, METH_VARARGS, "umount"},
-  {"mount",  do_mount, METH_VARARGS, "mount"},
   {"mount_bind",  do_mount_bind, METH_VARARGS, "mount(,,,MS_BIND,)"},
-  {"mount_move",  do_mount_move, METH_VARARGS, "mount(,,,MS_MOVE,)"},
   {"mount_tmpfs",  do_mount_tmpfs, METH_VARARGS, "mount(,,tmpfs,MS_NOSUID,mode=0755)"},
   {"remount",  do_remount, METH_VARARGS, "mount(,,,MS_REMOUNT|MS_NODEV|MS_NOSUID,)"},
   {"set_cap",  do_set_cap, METH_VARARGS, "set_cap"},
