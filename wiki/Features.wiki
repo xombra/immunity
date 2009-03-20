@@ -1,7 +1,7 @@
 ﻿#summary Features and design of immunity.
 #labels Featured,Phase-Design
 
-* switches to a shadow user with the name "immunity-$USER" and the home dir "/var/lib/immunity/$USER" to avoid IPC, debugging, signals, ...
-* switches to group "immunity" that allows easy definition of filesystem ACLs and iptable rules
-* reduce the set of supplementary groups to "audio"
+ * switches to a shadow user with the name "immunity-$USER" and the home dir "/var/lib/immunity/$USER" to avoid IPC, debugging, signals, ...
+ * switches to group "immunity" that allows easy definition of filesystem ACLs and iptable rules
+ * reduce the set of supplementary groups to "audio"
 
