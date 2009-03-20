@@ -88,6 +88,42 @@ PyObject* do_mount_move(PyObject *self, PyObject *args)
   return Py_None;
 }
 
+static PyObject* do_mount_tmpfs(PyObject *self, PyObject *args);
+
+PyObject* do_mount_tmpfs(PyObject *self, PyObject *args)
+{
+  const char *dir;
+  if (!PyArg_ParseTuple(args, "s", &dir)) {
+    return NULL;
+  }
+  if (mount("tmpfs", dir, "tmpfs", MS_NOSUID, "mode=0755") != 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject* do_mount_aufs(PyObject *self, PyObject *args);
+
+PyObject* do_mount_aufs(PyObject *self, PyObject *args)
+{
+  const char *source, *target, *data;
+  if (!PyArg_ParseTuple(args, "ss", &source, &target)) {
+    return NULL;
+  }
+  asprintf(&data, "br=%s=ro", source);
+  if (mount("aufs", target, "aufs", MS_NODEV | MS_NOSUID | MS_RDONLY, data) != 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+
+  free(data);
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject* do_set_cap(PyObject *self, PyObject *args);
 
 PyObject* do_set_cap(PyObject *self, PyObject *args)
@@ -172,6 +208,8 @@ static PyMethodDef ImmunityMethods[] = {
   {"mount",  do_mount, METH_VARARGS, "mount"},
   {"mount_bind",  do_mount_bind, METH_VARARGS, "mount(,,,MS_BIND,)"},
   {"mount_move",  do_mount_move, METH_VARARGS, "mount(,,,MS_MOVE,)"},
+  {"mount_tmpfs",  do_mount_tmpfs, METH_VARARGS, "mount(,,tmpfs,MS_NOSUID,mode=0755)"},
+  {"mount_aufs",  do_mount_aufs, METH_VARARGS, "mount(,,aufs,MS_NODEV|MS_NOSUID|MS_RDONLY,)"},
   {"set_cap",  do_set_cap, METH_VARARGS, "set_cap"},
   {"keep_caps",  keep_caps, METH_VARARGS, "keep_caps"},
   {"lock_caps",  lock_caps, METH_VARARGS, "lock_caps"},

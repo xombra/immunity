@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Torsten Werner <twerner@debian.org>
 Standards-Version: 3.8.0
 Build-Depends: debhelper (>= 5), cdbs, python-support, python-all-dev,
- libcap2-dev
+ libcap2-dev, aufs-modules, aufs-tools
 
 Package: immunity
 Architecture: any

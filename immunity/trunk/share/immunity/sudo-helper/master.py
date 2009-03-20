@@ -56,10 +56,14 @@ def mount_bind(path):
     open(target, "w").close()
   immunity.mount_bind(path, target)
 
+def mount_aufs(path):
+  target = "/mnt" + path
+  makedirs(target)
+  immunity.mount_aufs(path, target)
+
 def mount_tmpfs(dir):
   makedirs(dir)
-  immunity.mount("tmpfs", dir, "tmpfs")
-  os.chmod(dir, 0755)
+  immunity.mount_tmpfs(dir)
 
 def alsa():
   makedirs("/mnt/dev/snd")
@@ -70,7 +74,7 @@ def alsa():
 def fake_filesystem():
   immunity.set_cap("cap_sys_admin+ep cap_mknod,cap_sys_chroot,cap_setpcap+p")
   mount_tmpfs("/mnt")
-  mount_bind("/bin")
+  mount_aufs("/bin")
   mount_bind("/dev/null")
   mount_bind("/etc/X11")
   mount_bind("/etc/alternatives")
@@ -95,14 +99,13 @@ def fake_filesystem():
   mount_bind("/lib")
   mount_bind("/proc")
   mount_bind("/tmp/.X11-unix")
-  mount_bind("/usr/bin")
-  mount_bind("/usr/lib")
+  mount_aufs("/usr/bin")
+  mount_aufs("/usr/lib")
   mount_bind("/usr/share")
   mount_bind("/var/cache/fontconfig")
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
-  os.chmod("/mnt/tmp", 0777)
   immunity.set_cap("cap_mknod+ep cap_sys_chroot,cap_setpcap+p")
   alsa()
   immunity.set_cap("cap_sys_chroot+ep cap_setpcap+p")
