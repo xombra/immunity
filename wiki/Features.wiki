@@ -15,4 +15,5 @@
  * reduces number of device files to {{{/dev/null}}} and {{{/dev/snd/*}}} (alsa)
  * locks down all capabilities
  * implemented in Python
+ * transfers X authorization to the shadow user
 
