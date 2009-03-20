@@ -6,8 +6,9 @@ immunity (0.3) UNRELEASED; urgency=low
   * Do no longer make /tmp world writable.
   * Remove unused functions from the Python module.
   * Put shadow user into supplementary group "audio".
+  * Remove last reference to tmp directory.
 
- -- Torsten Werner <twerner@debian.org>  Fri, 20 Mar 2009 21:24:55 +0100
+ -- Torsten Werner <twerner@debian.org>  Fri, 20 Mar 2009 22:20:18 +0100
 
 immunity (0.2) experimental; urgency=low
 
