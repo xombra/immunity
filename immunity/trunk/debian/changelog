@@ -1,4 +1,4 @@
-immunity (0.3) UNRELEASED; urgency=low
+immunity (0.3) experimental; urgency=low
 
   * Lock down the browser process.
   * Disable suid and sgid binaries for tmpfs.
@@ -7,8 +7,9 @@ immunity (0.3) UNRELEASED; urgency=low
   * Remove unused functions from the Python module.
   * Put shadow user into supplementary group "audio".
   * Remove last reference to tmp directory.
+  * Improve INSTALL file.
 
- -- Torsten Werner <twerner@debian.org>  Fri, 20 Mar 2009 22:20:18 +0100
+ -- Torsten Werner <twerner@debian.org>  Fri, 20 Mar 2009 22:30:50 +0100
 
 immunity (0.2) experimental; urgency=low
 

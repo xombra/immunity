@@ -2,3 +2,6 @@ To build and install immunity please execute:
 
 make
 sudo make install
+
+Add the snippet examples/sudoers or something similar to your
+/etc/sudoers file.
