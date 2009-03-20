@@ -2,8 +2,7 @@ immunity (0.3) UNRELEASED; urgency=low
 
   * Lock down the browser process.
   * Disable suid and sgid binaries for tmpfs.
-  * Use aufs mounts instead of bind mounts to effectively disable suid and
-    sgid binaries.
+  * Disable device files and suid and sgid binaries by remounting "/".
   * Do no longer make /tmp world writable.
 
  -- Torsten Werner <twerner@debian.org>  Fri, 20 Mar 2009 12:13:24 +0100
