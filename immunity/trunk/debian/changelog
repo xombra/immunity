@@ -1,3 +1,10 @@
+immunity (0.4) UNRELEASED; urgency=low
+
+  * Create .Xauthority file in untrusted mode.
+  * Change default command from "/bin/sh" to "/bin/bash".
+
+ -- Torsten Werner <twerner@debian.org>  Fri, 27 Mar 2009 17:13:36 +0100
+
 immunity (0.3) experimental; urgency=low
 
   * Lock down the browser process.

@@ -17,7 +17,7 @@ def switch_sudo_user(target_user):
 def get_xauth(target_user):
   switch_sudo_user(target_user)
   (input, output) = os.popen2(("/usr/share/immunity/get_xauth.py",), "r")
-  return output.readline()
+  return output.read()
 
 def clear_environment():
   language = os.getenv("LANG")
@@ -107,9 +107,10 @@ def fake_filesystem():
   os.chdir(os.getcwd())
 
 def set_xauth(data):
-  (input, output) = os.popen2(("xauth", "nmerge", "-"), "w")
-  input.write(data)
-  input.close()
+  xauthfile = open(".Xauthority", "w")
+  os.chmod(".Xauthority", 0600)
+  xauthfile.write(data)
+  xauthfile.close()
 
 def main():
   immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
@@ -128,7 +129,7 @@ def exec_command():
   if len(sys.argv) > 1:
     command = sys.argv[1]
   else:
-    command = "/bin/sh"
+    command = "/bin/bash"
   args = [command]
   args.extend(sys.argv[2:])
   os.execvp(command, args)
