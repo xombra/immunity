@@ -16,4 +16,5 @@
  * locks down all capabilities
  * implemented in Python
  * transfers X authorization to the shadow user
+ * employs the X11 security extension (no screenshotting, keyboard stealing, copying + pasting)
 
