@@ -86,6 +86,7 @@ def fake_filesystem():
   mount_bind("/etc/ld.so.cache")
   mount_bind("/etc/locale.alias")
   mount_bind("/etc/localtime")
+  mount_bind("/etc/mailcap")
   mount_bind("/etc/mime.types")
   mount_bind("/etc/nsswitch.conf")
   mount_bind("/etc/orbitrc")

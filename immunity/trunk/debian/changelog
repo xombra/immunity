@@ -5,8 +5,9 @@ immunity (0.4) UNRELEASED; urgency=low
   * Copy device nodes instead of bind mounting them.
   * Bump up Standards-Version: 3.8.1 (no changes).
   * Remove supplementary group "audio" again.
+  * Add /etc/mailcap to bind mounts.
 
- -- Torsten Werner <twerner@debian.org>  Fri, 10 Apr 2009 21:43:12 +0200
+ -- Torsten Werner <twerner@debian.org>  Fri, 10 Apr 2009 23:04:37 +0200
 
 immunity (0.3) experimental; urgency=low
 
