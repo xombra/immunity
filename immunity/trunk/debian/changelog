@@ -1,9 +1,11 @@
 immunity (0.4) UNRELEASED; urgency=low
 
-  * Create .Xauthority file in untrusted mode.
+  * Explicitly create .Xauthority file in trusted mode.
   * Change default command from "/bin/sh" to "/bin/bash".
+  * Copy device nodes instead of bind mounting them.
+  * Bump up Standards-Version: 3.8.1 (no changes).
 
- -- Torsten Werner <twerner@debian.org>  Fri, 27 Mar 2009 17:13:36 +0100
+ -- Torsten Werner <twerner@debian.org>  Fri, 10 Apr 2009 21:11:29 +0200
 
 immunity (0.3) experimental; urgency=low
 

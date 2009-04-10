@@ -2,7 +2,7 @@ Source: immunity
 Section: net
 Priority: optional
 Maintainer: Torsten Werner <twerner@debian.org>
-Standards-Version: 3.8.0
+Standards-Version: 3.8.1
 Build-Depends: debhelper (>= 5), cdbs, python-support, python-all-dev,
  libcap2-dev
 

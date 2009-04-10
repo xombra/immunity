@@ -1,18 +1,18 @@
 #!/usr/bin/python
 
-import grp, immunity, os, pwd, stat, sys
+import glob, grp, immunity, os, pwd, stat, sys
 
 def switch_sudo_user(target_user):
-  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   os.setgroups([])
   pwd_data = pwd.getpwnam(target_user)
   os.setgid(pwd_data.pw_gid)
   grp_data = grp.getgrnam("audio")
   os.setgroups([grp_data.gr_gid])
-  immunity.set_cap("cap_setgid+p cap_setuid+ep cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_setgid+p cap_setuid+ep cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   immunity.keep_caps()
   os.setuid(pwd_data.pw_uid)
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
 
 def get_xauth(target_user):
   switch_sudo_user(target_user)
@@ -29,20 +29,20 @@ def clear_environment():
 
 def switch_user(target_user):
   pwd_data = pwd.getpwnam(target_user)
-  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_setgid+ep cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   os.setgid(pwd_data.pw_gid)
-  immunity.set_cap("cap_setuid+ep cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_setuid+ep cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   os.setuid(pwd_data.pw_uid)
-  immunity.set_cap("cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   os.putenv("USER", pwd_data.pw_name)
   homedir = pwd_data.pw_dir
   os.putenv("HOME", homedir)
   os.chdir(homedir)
 
 def new_namespace():
-  immunity.set_cap("cap_sys_admin+ep cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_sys_admin+ep cap_sys_chroot,cap_setpcap,cap_mknod+p")
   immunity.unshare_newns()
-  immunity.set_cap("cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
 
 def makedirs(dir):
   if not os.path.exists(dir):
@@ -61,13 +61,19 @@ def mount_tmpfs(dir):
   makedirs(dir)
   immunity.mount_tmpfs(dir)
 
+def copy_node(path):
+  target = "/mnt/" + path
+  dir = os.path.dirname(target)
+  makedirs(dir)
+  meta = os.stat(path)
+  mode = (meta.st_mode & ~07777) | 0600
+  os.mknod(target, mode, meta.st_rdev)
+
 def fake_filesystem():
-  immunity.set_cap("cap_sys_admin+ep cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_sys_admin+ep cap_sys_chroot,cap_setpcap,cap_mknod+p")
   mount_tmpfs("/mnt")
   immunity.remount("/")
   mount_bind("/bin")
-  mount_bind("/dev/null")
-  mount_bind("/dev/snd")
   mount_bind("/etc/X11")
   mount_bind("/etc/alternatives")
   mount_bind("/etc/fonts")
@@ -99,6 +105,10 @@ def fake_filesystem():
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
+  immunity.set_cap("cap_mknod+ep cap_sys_chroot,cap_setpcap+p")
+  copy_node("/dev/null")
+  for alsa_device in glob.glob("/dev/snd/*"):
+    copy_node(alsa_device)
   immunity.set_cap("cap_sys_chroot+ep cap_setpcap+p")
   os.chroot("/mnt")
   immunity.set_cap("cap_setpcap+ep")
@@ -113,7 +123,7 @@ def set_xauth(data):
   xauthfile.close()
 
 def main():
-  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  immunity.set_cap("cap_setgid,cap_setuid,cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   sudo_user = os.getenv("SUDO_USER")
   xauth_data = get_xauth(sudo_user)
   clear_environment()
