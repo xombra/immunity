@@ -7,8 +7,6 @@ def switch_sudo_user(target_user):
   os.setgroups([])
   pwd_data = pwd.getpwnam(target_user)
   os.setgid(pwd_data.pw_gid)
-  grp_data = grp.getgrnam("audio")
-  os.setgroups([grp_data.gr_gid])
   immunity.set_cap("cap_setgid+p cap_setuid+ep cap_sys_admin,cap_sys_chroot,cap_setpcap,cap_mknod+p")
   immunity.keep_caps()
   os.setuid(pwd_data.pw_uid)
