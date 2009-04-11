@@ -71,10 +71,25 @@ def copy_node(path):
   mode = (meta.st_mode & ~07777) | 0600
   os.mknod(target, mode, meta.st_rdev)
 
+def get_mounts():
+  dirs = []
+  mount_file = open("/proc/mounts")
+  for line in mount_file.readlines():
+    dir = line.split(" ")[1]
+    if dir != "/":
+      dirs.insert(0, dir)
+  return dirs
+
 def fake_filesystem():
+  orig_mounts = get_mounts()
   immunity.set_cap("cap_sys_admin+ep cap_sys_chroot,cap_setpcap,cap_mknod+p")
   mount_tmpfs("/mnt")
   immunity.remount("/")
+  immunity.set_cap("cap_mknod+ep cap_sys_admin,cap_sys_chroot,cap_setpcap+p")
+  copy_node("/dev/null")
+  for alsa_device in glob.glob("/dev/snd/*"):
+    copy_node(alsa_device)
+  immunity.set_cap("cap_sys_admin+ep cap_sys_chroot,cap_setpcap+p")
   mount_bind("/bin")
   mount_bind("/etc/X11")
   mount_bind("/etc/alternatives")
@@ -108,10 +123,8 @@ def fake_filesystem():
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
   mount_proc()
-  immunity.set_cap("cap_mknod+ep cap_sys_chroot,cap_setpcap+p")
-  copy_node("/dev/null")
-  for alsa_device in glob.glob("/dev/snd/*"):
-    copy_node(alsa_device)
+  for dir in orig_mounts:
+    immunity.umount(dir)
   immunity.set_cap("cap_sys_chroot+ep cap_setpcap+p")
   os.chroot("/mnt")
   immunity.set_cap("cap_setpcap+ep")

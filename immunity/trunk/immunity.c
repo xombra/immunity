@@ -5,6 +5,10 @@
 #include <sys/capability.h>
 #include <sys/prctl.h>
 
+#ifndef MNT_DETACH
+#define MNT_DETACH      0x00000002
+#endif
+
 static PyObject *ImmunityException;
 
 static PyObject* unshare_newns(PyObject *self, PyObject *args);
@@ -76,6 +80,23 @@ PyObject* do_remount(PyObject *self, PyObject *args)
     return NULL;
   }
   if (mount(NULL, dir, NULL, MS_REMOUNT | MS_NODEV | MS_NOSUID, NULL) != 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject* do_umount(PyObject *self, PyObject *args);
+
+PyObject* do_umount(PyObject *self, PyObject *args)
+{
+  const char *dir;
+  if (!PyArg_ParseTuple(args, "s", &dir)) {
+    return NULL;
+  }
+  if (umount2(dir, MNT_DETACH) != 0) {
     PyErr_SetFromErrno(ImmunityException);
     return NULL;
   }
@@ -168,6 +189,7 @@ static PyMethodDef ImmunityMethods[] = {
   {"mount_tmpfs",  do_mount_tmpfs, METH_VARARGS, "mount(,,tmpfs,MS_NOSUID,mode=0755)"},
   {"mount_proc",  do_mount_proc, METH_VARARGS, "proc(,/proc,proc,MS_RDONLY,)"},
   {"remount",  do_remount, METH_VARARGS, "mount(,,,MS_REMOUNT|MS_NODEV|MS_NOSUID,)"},
+  {"umount",  do_umount, METH_VARARGS, "umount2(,MNT_DETACH)"},
   {"set_cap",  do_set_cap, METH_VARARGS, "set_cap"},
   {"keep_caps",  keep_caps, METH_VARARGS, "keep_caps"},
   {"lock_caps",  lock_caps, METH_VARARGS, "lock_caps"},

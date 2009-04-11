@@ -1,8 +1,9 @@
 immunity (0.5) UNRELEASED; urgency=low
 
   * Mount /proc directly and read only instead of bind mounting it.
+  * Umount unneeded filesystems.
 
- -- Torsten Werner <twerner@debian.org>  Sat, 11 Apr 2009 22:01:37 +0200
+ -- Torsten Werner <twerner@debian.org>  Sat, 11 Apr 2009 23:22:29 +0200
 
 immunity (0.4) experimental; urgency=low
 
