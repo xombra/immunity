@@ -1,0 +1,11 @@
+# input rules for smarti
+
+# create input chain
+$IPTABLES -N SMARTI_IN
+
+# deny internet access for external devices
+$IPTABLES -p tcp --dport 8080 -A SMARTI_IN  -i \! lo -j REJECT
+
+# activate chain
+$IPTABLES -I INPUT  1 -j SMARTI_IN
+

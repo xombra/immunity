@@ -1,0 +1,14 @@
+#!/bin/sh
+
+unset PATH
+
+SHADOW_GROUP="immunity"
+SHADOW_USER="immunity-$SUDO_USER"
+SHADOW_HOME="/var/lib/immunity/$SUDO_USER"
+/usr/sbin/useradd -d "$SHADOW_HOME" -g "$SHADOW_GROUP" -m -N "$SHADOW_USER"
+
+NEW_ACLS="user:$SUDO_USER:rwX,default:user:$SUDO_USER:rwx"
+/usr/bin/setfacl -R -m "$NEW_ACLS" $SHADOW_HOME
+
+exit 0
+

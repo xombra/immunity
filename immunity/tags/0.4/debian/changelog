@@ -1,0 +1,41 @@
+immunity (0.4) experimental; urgency=low
+
+  * Explicitly create .Xauthority file in trusted mode.
+  * Change default command from "/bin/sh" to "/bin/bash".
+  * Copy device nodes instead of bind mounting them.
+  * Bump up Standards-Version: 3.8.1 (no changes).
+  * Remove supplementary group "audio" again.
+  * Add /etc/mailcap to bind mounts.
+
+ -- Torsten Werner <twerner@debian.org>  Fri, 10 Apr 2009 23:04:37 +0200
+
+immunity (0.3) experimental; urgency=low
+
+  * Lock down the browser process.
+  * Disable suid and sgid binaries for tmpfs.
+  * Disable device files and suid and sgid binaries by remounting "/".
+  * Do no longer make /tmp world writable.
+  * Remove unused functions from the Python module.
+  * Put shadow user into supplementary group "audio".
+  * Remove last reference to tmp directory.
+  * Improve INSTALL file.
+
+ -- Torsten Werner <twerner@debian.org>  Fri, 20 Mar 2009 22:30:50 +0100
+
+immunity (0.2) experimental; urgency=low
+
+  * Use a private namespace.
+  * Fake up a fully different filesystem.
+  * Allow executing user specified command.
+  * Change default command to /bin/sh.
+  * Add capability support.
+  * Drop most capabilities early.
+  * Do no longer create a separate tmp directory.
+
+ -- Torsten Werner <twerner@debian.org>  Sun, 15 Mar 2009 16:29:24 +0100
+
+immunity (0.1) experimental; urgency=low
+
+  * initial release
+
+ -- Torsten Werner <twerner@debian.org>  Sun, 01 Mar 2009 23:00:46 +0100
