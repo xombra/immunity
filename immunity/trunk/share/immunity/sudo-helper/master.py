@@ -59,6 +59,10 @@ def mount_tmpfs(dir):
   makedirs(dir)
   immunity.mount_tmpfs(dir)
 
+def mount_proc():
+  makedirs("/mnt/proc")
+  immunity.mount_proc()
+
 def copy_node(path):
   target = "/mnt/" + path
   dir = os.path.dirname(target)
@@ -95,7 +99,6 @@ def fake_filesystem():
   mount_bind("/etc/resolv.conf")
   mount_bind("/etc/resolvconf")
   mount_bind("/lib")
-  mount_bind("/proc")
   mount_bind("/tmp/.X11-unix")
   mount_bind("/usr/bin")
   mount_bind("/usr/lib")
@@ -104,6 +107,7 @@ def fake_filesystem():
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
+  mount_proc()
   immunity.set_cap("cap_mknod+ep cap_sys_chroot,cap_setpcap+p")
   copy_node("/dev/null")
   for alsa_device in glob.glob("/dev/snd/*"):

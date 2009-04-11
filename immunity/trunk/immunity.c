@@ -54,6 +54,19 @@ PyObject* do_mount_tmpfs(PyObject *self, PyObject *args)
   return Py_None;
 }
 
+static PyObject* do_mount_proc(PyObject *self, PyObject *args);
+
+PyObject* do_mount_proc(PyObject *self, PyObject *args)
+{
+  if (mount("proc", "/mnt/proc", "proc", MS_RDONLY, 0) != 0) {
+    PyErr_SetFromErrno(ImmunityException);
+    return NULL;
+  }
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
 static PyObject* do_remount(PyObject *self, PyObject *args);
 
 PyObject* do_remount(PyObject *self, PyObject *args)
@@ -153,6 +166,7 @@ static PyMethodDef ImmunityMethods[] = {
   {"unshare_newns",  unshare_newns, METH_VARARGS, "unshare(newns)"},
   {"mount_bind",  do_mount_bind, METH_VARARGS, "mount(,,,MS_BIND,)"},
   {"mount_tmpfs",  do_mount_tmpfs, METH_VARARGS, "mount(,,tmpfs,MS_NOSUID,mode=0755)"},
+  {"mount_proc",  do_mount_proc, METH_VARARGS, "proc(,/proc,proc,MS_RDONLY,)"},
   {"remount",  do_remount, METH_VARARGS, "mount(,,,MS_REMOUNT|MS_NODEV|MS_NOSUID,)"},
   {"set_cap",  do_set_cap, METH_VARARGS, "set_cap"},
   {"keep_caps",  keep_caps, METH_VARARGS, "keep_caps"},
