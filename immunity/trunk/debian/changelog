@@ -1,4 +1,4 @@
-immunity (0.4) UNRELEASED; urgency=low
+immunity (0.4) experimental; urgency=low
 
   * Explicitly create .Xauthority file in trusted mode.
   * Change default command from "/bin/sh" to "/bin/bash".
