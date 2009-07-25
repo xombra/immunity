@@ -96,6 +96,7 @@ def fake_filesystem():
   mount_bind("/bin")
   mount_bind("/etc/X11")
   mount_bind("/etc/alternatives")
+  mount_bind("/etc/dbus-1")
   mount_bind("/etc/fonts")
   mount_bind("/etc/gai.conf")
   mount_bind("/etc/gconf")
