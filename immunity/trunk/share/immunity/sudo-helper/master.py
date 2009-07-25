@@ -47,6 +47,9 @@ def makedirs(dir):
     os.makedirs(dir)
 
 def mount_bind(path):
+  if not os.path.exists(path):
+    print "WARNING: ignoring mount_bind(%s)!" % path
+    return
   target = "/mnt" + path
   if os.path.isdir(path):
     makedirs(target)
@@ -119,6 +122,7 @@ def fake_filesystem():
   mount_bind("/usr/lib")
   mount_bind("/usr/share")
   mount_bind("/var/cache/fontconfig")
+  mount_bind("/var/lib/dbus/machine-id")
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")

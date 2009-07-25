@@ -2,8 +2,10 @@ immunity (0.5) UNRELEASED; urgency=low
 
   * Mount /proc directly and read only instead of bind mounting it.
   * Umount unneeded filesystems.
+  * Bind mount /var/lib/dbus/machine-id.
+  * Ignore nonexistent paths in mount_bind().
 
- -- Torsten Werner <twerner@debian.org>  Sat, 11 Apr 2009 23:22:29 +0200
+ -- Torsten Werner <twerner@debian.org>  Sat, 25 Jul 2009 13:53:36 +0200
 
 immunity (0.4) experimental; urgency=low
 
