@@ -127,6 +127,7 @@ def fake_filesystem():
   mount_bind("/var/lib/defoma")
   mount_bind("/var/lib/gconf")
   mount_bind("/var/lib/immunity")
+  mount_bind("/var/run/dbus")
   mount_proc()
   for dir in orig_mounts:
     immunity.umount(dir)
