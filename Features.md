@@ -1,0 +1,21 @@
+﻿#summary Features and design of immunity.
+#labels Featured,Phase-Design
+
+  * switches to a shadow user with the name "immunity-$USER" and the home dir "/var/lib/immunity/$USER" to avoid any dangerous interprocess communication, debugging, signals, ...
+  * switches to group "immunity" that allows easy definition of filesystem ACLs and netfilter rules
+  * reduce the set of supplementary groups to "audio"
+  * works with a vanilla Linux kernel and does not need any external modules
+  * does not need packages not available in Debian or other major distros
+  * does depend on features of the Linux kernel and won't work with other non Linux kernels
+  * does not need SELinux or any other complex security framework
+  * employs polyinstantiation of the filesystem
+  * narrows the filesystem in the container
+    * only parts of /etc, /dev, /usr, /var and other parts of the filesystem can be seen in the container
+    * no /boot, /home, /media, /mnt, /root, /sbin, /sys, ...
+    * /proc will be optional in the future; /proc/bus/usb has already been disabled
+  * disables all suid and sgid binaries
+  * reduces number of device files to `/dev/null` and `/dev/snd/*` (alsa)
+  * locks down all capabilities; they can't be regained from user space
+  * implemented in Python
+  * transfers X authorization to the shadow user; optional feature in the future
+  * employs the X11 security extension (no screenshotting, keyboard stealing, copying + pasting); will be made optional in the future

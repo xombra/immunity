@@ -1,0 +1,22 @@
+﻿#summary This page describes how to install immunity.
+#labels Featured,Phase-Deploy
+
+# Debian, Ubuntu or other Debian derivatives #
+
+Please download the Debian package and install it with dpkg or a GUI frontend like gdebi.
+
+# Other Linux Systems #
+
+Please download the tarball, unpack it, and read the
+[INSTALL](http://immunity.googlecode.com/svn/immunity/trunk/INSTALL) file.
+
+# Post Installation Instructions #
+
+Add a line
+```
+ALL ALL=(ALL)NOPASSWD: /usr/share/immunity/sudo-helper/
+```
+to `/etc/sudoers` manually. Finally you have to log out and log in yourself.
+
+Please file any bugs at
+[the issue tracker](http://code.google.com/p/immunity/issues/list).
